@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+ 
+ <title>jimbokun's blog</title>
+ <link href="http://jimbokun.github.com/atom.xml" rel="self"/>
+ <link href="http://jimbokun.github.com"/>
+ <updated>2012-09-24T00:07:29-04:00</updated>
+ <id>http://jimbokun.github.com</id>
+ <author>
+   <name>Jim Rankin</name>
+   <email>jimbokun@gmail.com</email>
+ </author>
+
+ 
+ <entry>
+   <title>Small and Fast</title>
+   <link href="http://jimbokun.github.com/programming languages/2012/09/23/small-and-fast"/>
+   <updated>2012-09-23T00:00:00-04:00</updated>
+   <id>http://jimbokun.github.com/programming languages/2012/09/23/small-and-fast</id>
+   <content type="html">&lt;h1 id='small_and_fast'&gt;SMALL AND FAST&lt;/h1&gt;
+
+&lt;p&gt;My favorite article comparing programming languages is &lt;a href='http://blog.gmarceau.qc.ca/2009/05/speed-size-and-dependability-of.html'&gt;The speed, size and dependability of programming languages&lt;/a&gt; by Guillaume Marceau. Guillaume plots program size against execution time for programs written in various languages, implementing benchmarks from &lt;a href='http://shootout.alioth.debian.org/'&gt;The Computer Language Benchmark Game&lt;/a&gt;. With the X axis program size and the Y axis execution time, the ideal language would have all of its programs plotted in the lower left corner of the chart. Evidently, his idea was popular enough that now the Benchmarks Game keeps an &lt;a href='http://shootout.alioth.debian.org/u64/code-used-time-used-shapes.php'&gt;up to date version&lt;/a&gt; of these charts.&lt;/p&gt;
+
+&lt;p&gt;Programming language features besides program size and execution speed might be more important in some contexts, but broadly speaking, much of the history of programming language design is a search for the lower left hand corner of Guillaume&amp;#8217;s chart. Paul Graham argures for a programming language &lt;a href='http://www.paulgraham.com/power.html'&gt;&amp;#8220;succinctness = power.&amp;#8221;&lt;/a&gt; Faster programs are more responsive, answer questions faster, and consume fewer processing resources. Writing short programs is often at odds with writing fast programs, so achieving both simultaneously is a kind of Holy Grail of programming language design.&lt;/p&gt;
+
+&lt;p&gt;This article presents a high level, qualitative review of strategies for writing small and fast programs. To keep the scope manageable, only performance in a single thread and address space is considered, ignoring parallel and distributed computing concerns. Those are very important aspects of writing small and fast programs, but not the topic of this article.&lt;/p&gt;
+
+&lt;p&gt;Even with these caveats and constraints, I am sure I have missed a lot and gotten a lot wrong. I hope this spawns a dialog better informing me how to write small and fast programs.&lt;/p&gt;
+
+&lt;h2 id='language_stacks'&gt;LANGUAGE STACKS&lt;/h2&gt;
+
+&lt;p&gt;If it is difficult to design a single language yielding small, fast programs, an alternative is to write your program in multiple languages. Many languages implement a Foreign Function Interface (FFI) for exactly this reason. The language calling the FFI is usually optimized for writing small programs, and the foreign language is usually optimized for writing fast programs, often a dialect of C.&lt;/p&gt;
+
+&lt;p&gt;An example is the &lt;a href='http://numpy.scipy.org'&gt;NumPy/SciPy&lt;/a&gt; environment, a popular tool for scientists, engineers, statisticians and others to quickly crunch large amounts of numeric data and visualize the results. These users are often not professional programmers, and the work is often exploratory, so the ability to quickly write short programs, immediately see the results, and rapidly iterate are critically important.&lt;/p&gt;
+
+&lt;p&gt;Python fulfills these requirements in NumPy. Python supports a Read Eval Print Loop for executing code a line at at time and immediately displaying the results, as seen &lt;a href='http://www.scipy.org/Cookbook/OptimizationDemo1'&gt;here&lt;/a&gt;. Python is also good for writing short programs. It doesn&amp;#8217;t require explicit type declarations for variables or functions and includes features like &lt;a href='http://thejosephturner.com/blog/2011/01/07/project-euler-problem-4/'&gt;list comprehensions&lt;/a&gt; for concisely filtering and transforming lists, among many other features to support writing short programs.&lt;/p&gt;
+
+&lt;p&gt;However, Python is not well suited for rapidly crunching large amounts of numeric data. Those tasks are performed in NumPy by Fortran libraries like &lt;a href='http://www.netlib.org/lapack/'&gt;LAPACK&lt;/a&gt; and other libraries written in C. Fortran and C require programmers to provide explicit information about the types and sizes of values and variables, which Fortran and C compilers utilize to emit highly optimized executable code. Of course, these same requirments result in longer programs compared to Python.&lt;/p&gt;
+
+&lt;p&gt;In Guillaume&amp;#8217;s chart, these language characteristics are reflected by C and Fortran&amp;#8217;s positions against the left hand side of the chart (fast but longer programs) and Python in the lower right (short but slow programs).&lt;/p&gt;
+
+&lt;p&gt;Key to producing small, fast programs using the &amp;#8220;language stack&amp;#8221; strategy is understanding which operations in the high level languages are passed off to efficient implementations in the lower level language. For example, one semester I decided to implement all the homework assignments for a particular course in Python and NumPy. The first few assignments went without a hitch, but for one assignment, I realized my program was not going to finish processing the assignment dataset before the assignment deadline. In the NumPy source I found a function consuming much of the program execution time, implemented entirely in Python. I didn&amp;#8217;t see any easy way to avoid calling that particular function, and didn&amp;#8217;t have enough time to figure out how to patch NumPy, so I re-implemented my program in Java using the &lt;a href='http://math.nist.gov/javanumerics/jama/'&gt;JAMA&lt;/a&gt; library which completed in time for me to turn in my assignment only slightly late.&lt;/p&gt;
+
+&lt;p&gt;In general, knowing which data structures and functions have been optimized in languages like Python, Ruby and Perl can make a big difference in writing fast programs. As Alex Rubinsteyn notes in his &lt;a href='http://blog.explainmydata.com/2012/07/expensive-lessons-in-python-performance.html'&gt;performance tuning tips&lt;/a&gt; for number crunching with NumPy and other Python libraries, &amp;#8220;have faith in Python&amp;#8217;s core operations.&amp;#8221;&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;On the other hand, once the obviously vectorizable stuff is off-loaded to library code, then I&amp;#8217;m often surprised just how efficient Python&amp;#8217;s operations can be. I can build lists of startling length, index into dictionaries all day long, construct millions of simple objects, and it all adds up to a small fraction of my total runtime.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;This is because Python&amp;#8217;s core operations are implemented in highly optimized C, and thus much faster than code written entirely in Python.&lt;/p&gt;
+
+&lt;p&gt;There are many other examples of the &amp;#8220;language stack&amp;#8221; strategy. Many game engines are written in C++ and scripted with &lt;a href='http://stackoverflow.com/questions/5053134/what-is-a-good-game-engine-that-uses-lua'&gt;Lua&lt;/a&gt;. Objective C and &lt;a href='http://macruby.org/'&gt;MacRuby&lt;/a&gt;/&lt;a href='http://www.rubymotion.com/'&gt;RubyMotion&lt;/a&gt; are an interesting language stack. Objective C adds SmallTalk style message passing as an extension to C, making it a nice semantic fit with Ruby, which also draws inspiration from SmallTalk style message passing.&lt;/p&gt;
+
+&lt;p&gt;With the availability of higher level languages like Jython, the language stack strategy can also be deployed on the Java Virtual Machine. In Guillaume&amp;#8217;s chart Java is closer to C and Fortran than Python. Where I work, our core libraries are implemented in Java but I do a lot of scripting and exploratory development invoking those libraries from Jython. The &lt;a href='http://incanter.org/'&gt;Incanter&lt;/a&gt; project is similar to NumPy, with Java playing the role of C/Fortran and Clojure playing the role of Python.&lt;/p&gt;
+
+&lt;p&gt;Tools like &lt;a href='https://github.com/scipy/scipy/blob/master/scipy/weave/doc/tutorial.txt'&gt;Python Weave&lt;/a&gt; take the language stack strategy even farther by allowing programmers to include C code directly in Python source files.&lt;/p&gt;
+
+&lt;h2 id='optional_types'&gt;OPTIONAL TYPES&lt;/h2&gt;
+
+&lt;p&gt;Picking one language requiring explicit type information to help the compiler emit fast code, and one language not requiring explicit type information to enable smaller programs, gives a lot of flexibility in trading off program size and execution time. However, switching between languages and toolsets then integrating the results to get a working system is less productive than writing everything in a single language, everything else being equal.&lt;/p&gt;
+
+&lt;p&gt;So why not start with concise, expressive code cleanly expressing a program&amp;#8217;s intent, then add type declarations to improve performance bottlenecks and hotspots? Common Lisp allows precisely this approach, as described in &lt;a href='http://www.cs.cmu.edu/Groups/AI/html/cltl/clm/node103.html'&gt;Common Lisp the Language&lt;/a&gt;.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Declarations allow you to specify extra information about your program to the Lisp system. &amp;#8230;&lt;span&gt;D&lt;/span&gt;eclarations are completely optional and correct declarations do not affect the meaning of a correct program.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&amp;#8230;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;span&gt;D&lt;/span&gt;eclarations are of an advisory nature, and may be used by the Lisp system to aid the programmer by performing extra error checking or producing more efficient compiled code. Declarations are also a good way to add documentation to a program.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;In other words, write a correct, straightforward implementation of the program, then add declarations to get the required performance characteristics, among other benefits.&lt;/p&gt;
+
+&lt;p&gt;Didier Verna documents applying this technique to make Common Lisp programs &lt;a href='http://www.iaeng.org/IJCS/issues_v32/issue_4/IJCS_32_4_19.pdf'&gt;as fast as equivalent C programs&lt;/a&gt;. For his experiments, Didier &amp;#8220;benchmarked, in both languages, 4 simple &lt;span&gt;image processing&lt;/span&gt; algorithms to measure the performances of the fundamental low-level operations: massive pixel access and arithmetic processing.&amp;#8221;&lt;/p&gt;
+
+&lt;p&gt;Here is a sample C function from his experiments.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;void add (image *to, image *from, float val) {
+    int i;
+    const int n = ima-&amp;gt;n;
+	for (i = 0; i &amp;lt; n; ++i)
+        to-&amp;gt;data[i] = from-&amp;gt;data[i] + val;
+}&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Here is the corresponding, unoptimized version of that function in Common Lisp.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;(defun add (to from val)
+    (let (( size (array-dimension to 0)))
+        (dotimes (i size)
+            (setf (aref to i) (+ (aref from i) val)))))&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Running the interpreted version of this function in CMU CL was 2300 times slower than the C version, the compiled, unoptimized version was 60 times slower, and the compiled, optimized version was 20 times slower.&lt;/p&gt;
+
+&lt;p&gt;Here is the same function with type declarations.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;(defun add (to from val)
+    (declare (type (simple-array single-float (*)) to from))
+    (declare (type single-float val))
+    (let (( size (array-dimension to 0)))
+        (dotimes (i size)
+            (setf (aref to i) (+ (aref from i) val)))))&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;With declarations like these added, the Lisp code compiled by CMU CL with fully optimized, unsafe settings performed almost identically to C for most of the algorithms. CMU CL was 3 times slower at integer division but 10 percent faster at float division.&lt;/p&gt;
+
+&lt;p&gt;Why does adding type declarations make the program so much faster? Didier gives a few reasons.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&amp;#8230;&lt;span&gt;C&lt;/span&gt;ontrary to C, variables and function arguments &amp;#8230; could hold any Lisp object. As a consequence, the compiled Lisp code has to check dynamically that the variables we use are of the proper type with respect to the operations we want to apply to them.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&amp;#8230;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Lisp objects contain type information plus a pointer to the real value. And obviously, pointer (de)referencing is causing a major performance loss.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;One caveat to this approach is that different Common Lisp &amp;#8221;&lt;span&gt;c&lt;/span&gt;ompilers may behave very differently with respect to type declarations and may provide type inference systems of various quality.&amp;#8221; Didier presents an example where CMU CL performs optimizations that Allegro CL does not. In general, the capabilities of a particular Common Lisp implementation determine what declarations are needed to meet performance requirements, if possible at all.&lt;/p&gt;
+
+&lt;p&gt;Michael Weber brings to light another caveat to this approach. He implemented the &lt;a href='http://www.foldr.org/~michaelw/log/programming/lisp/reverse-complement-benchmark'&gt;reverse-complement benchmark&lt;/a&gt; from the Computer Language Benchmarks game in Steel Bank Common Lisp (SBCL), beating every other implementation except gcc. Note this is from 2006, and the current SBCL implementation is further down the leaderboard for that benchmark. However, Michael also points out &amp;#8220;Approaching the speed of C seems to force us to more or less write C in Lisp.&amp;#8221; In other words, once enough declarations are added to give the Common Lisp compiler as much information as the C compiler, the Lisp code can be just as verbose as C code, if not moreso. There is still the benefit of writing the entire program in one language, and declarations can be confined to performance hotspots, but C like performance does not come for free.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href='http://jakevdp.github.com/blog/2012/08/24/numba-vs-cython/'&gt;Numba and Cython&lt;/a&gt; make it possible to add declarations to speed up Python programs. The article shows an example of a 1,000x speed up of a Python program with a couple of declarations for the Numba Just-In-Time compiler. The same article shows an additional 30% improvement over Numba for a version with declarations for Cython, which &amp;#8220;allows python and/or python-like code to be compiled into C for fast operations.&amp;#8221;&lt;/p&gt;
+
+&lt;p&gt;Clojure allows programmers to add &lt;a href='http://clojure.org/java_interop?f=print#Java%20Interop-Type%20Hints'&gt;type hints&lt;/a&gt; to avoid reflection when invoking Java methods in performance critical parts of the code. The example given in the documentation for this feature shows a factor of 10 speed up in a simple function by introducing a type hint.&lt;/p&gt;
+
+&lt;p&gt;Google&amp;#8217;s Dart language has optional static type declarations, but currently they are only used for tooling and compiler warnings and otherwise have &lt;a href='http://gotocon.com/dl/goto-aarhus-2011/slides/GiladBracha_and_LarsBak_OpeningKeynoteDartANewProgrammingLanguageForStructuredWebProgramming.pdf'&gt;&amp;#8220;no effect and no cost.&amp;#8221;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id='types_with_less_typing'&gt;TYPES WITH LESS TYPING&lt;/h2&gt;
+
+&lt;p&gt;Providing optional, explicit type information in performance critical code regions allows programmers to trade off program size and execution speed without having to jump between languages. What if we could give the compiler complete information about all the types throughout our program, while only having to type out those types explicitly in a very limited number of places? Program size would benefit from eliminating most of the explicit type information, and compilers would have enough information to perform lots of performance optimizations.&lt;/p&gt;
+
+&lt;p&gt;This is the approach taken by functional languages like Haskell and OCaml. In &lt;a href='http://queue.acm.org/detail.cfm?id=2038036'&gt;OCaml for the Masses&lt;/a&gt;, Yaron Minsky cites concision and performance among the reasons &lt;a href='http://www.janestreet.com/technology/ocaml.php'&gt;Jane Street&lt;/a&gt; has built much of their infrastructure in OCaml.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Our experience with OCaml on the research side convinced us that we could build smaller, simpler, easier-to-understand systems in OCaml than we could in languages such as Java or C#. For an organization that valued readability, this was a huge win.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&amp;#8230;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;We found that OCaml&amp;#8217;s performance was on par with or better than Java&amp;#8217;s, and within spitting distance of languages such as C or C++.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Yaron credits type inference with making OCaml programs faster and more concise.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;One advantage OCaml brings to the table is type inference, which obviates the need for many type declarations. This leaves you with code that is roughly as compact as code written in dynamic languages such as Python and Ruby. At the same time, you get the performance and correctness benefits of static types.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;As an example, Yaron presents a function that applies the function f to all three elements of a tuple. Here is the OCaml implementation.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;let map f (x,y,z) =
+    (f x, f y, f z)&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Here is the equivalent function implemented in C#.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Tuple&amp;lt;U,U,U&amp;gt; Map&amp;lt;T,U&amp;gt;(Func &amp;lt;T,U&amp;gt; f, Tuple&amp;lt;T,T,T&amp;gt; t) {
+    return new Tuple&amp;lt;U,U,U&amp;gt;(f(t.item1), f(t.item2), f(t.item3));
+}&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The OCaml code is much shorter but just as strongly typed as the C# code, without all of the generic type parameters.&lt;/p&gt;
+
+&lt;p&gt;The book &lt;a href='http://book.realworldhaskell.org/read/why-functional-programming-why-haskell.html#id528487'&gt;Real World Haskell&lt;/a&gt; makes similar claims about the benefits of type inference in Haskell. Type inference makes Haskell programs smaller than languages requiring explicit types.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Although powerful, Haskell&amp;#8217;s type system is often also unobtrusive. If we omit explicit type information, a Haskell compiler will automatically infer the type of an expression or function. Compared to traditional static languages, to which we must spoon-feed large amounts of type information, the combination of power and inference in Haskell&amp;#8217;s type system significantly reduces the clutter and redundancy of our code.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;A &lt;a href='http://haskell.cs.yale.edu/?post_type=publication&amp;amp;p=366'&gt;study&lt;/a&gt; comparing Haskell productivity against several other languages lends support to the claim that Haskell yields concise programs.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;The results indicate that the Haskell prototype took significantly less time to develop and was considerably more concise and easier to understand than the corresponding prototypes written in several different imperative languages, including Ada and C++.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;And type inference makes Haskell programs faster than &amp;#8220;dynamic&amp;#8221; languages that don&amp;#8217;t require explicit types.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;When we consider runtime performance, Haskell almost always has a huge advantage. Code compiled by the Glasgow Haskell Compiler (GHC) is typically between 20 and 60 times faster than code run through a dynamic language&amp;#8217;s interpreter.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;One important difference, however, is Haskell&amp;#8217;s default &amp;#8220;lazy&amp;#8221; evaluation strategy versus OCaml&amp;#8217;s default &amp;#8220;strict&amp;#8221; evaluation strategy. Haskell &amp;#8220;defer(s) every computation until its result is actually needed.&amp;#8221; On the one hand, this can avoid unneccessary computation and allows for the creation of &amp;#8220;infinite&amp;#8221; data structures (because only the data actually needed for the end result will be computed). On the other hand, laziness makes performance very hard to predict.&lt;/p&gt;
+
+&lt;p&gt;Enforcing strict evaluation is often cited as a way to improve Haskell performance. Johan Tibell presents several examples of improving performance by avoiding lazy evaluation in his &lt;a href='http://www.slideshare.net/tibbe/highperformance-haskell'&gt;High-Performance Haskell&lt;/a&gt; slide deck. The Haskell wiki has a section on improving performance through &lt;a href='http://www.haskell.org/haskellwiki/Performance/Strictness#Strictness_analysis'&gt;strictness analysis.&lt;/a&gt; As an aside, &lt;a href='http://blog.thezerobit.com/2012/07/21/immutable-persistent-data-structures-in-common-lisp.html'&gt;this&lt;/a&gt; article also cites laziness as a reason for Haskell underperforming Standard ML (a language in the ML family, like OCaml).&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Every implementation of Standard ML (not lazy) I&amp;#8217;ve tried has varied from just being somewhat to several times faster than Haskell where all computation is lazy. I think setting up all that delayed computation is expensive, and the only way I found to make Haskell perform within the same ball park as Standard ML, was to add hints here and there to get computations to go ahead and happen instead of building a stack of thunks.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;On the other hand, Yaron praises the predictability of OCaml performance in &lt;a href='http://www.haskell.org/wikiupload/0/03/TMR-Issue7.pdf'&gt;Caml Trading: Experiences in Functional Programming on Wall Street&lt;/a&gt;.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Another important aspect of OCaml&amp;#8217;s performance is its predictability. OCaml has a reasonably simple execution model, making it easy to look at a piece of OCaml code and understand roughly how much space it is going to use and how fast it is going to run.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Which is very important for Jane Street, as they need to perform &lt;a href='http://janestreet.com/yaron_minsky-cufp_2006.pdf'&gt;hundreds of thousands of transactions per second, with sub second latency&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Similar to the notion of &amp;#8220;writing C in Lisp,&amp;#8221; writing highly performant code in high level functional languages can also require writing code that is less succint. Yaron Minsky describes how this manifests in &lt;a href='http://www.haskell.org/wikiupload/0/03/TMR-Issue7.pdf'&gt;OCaml.&lt;/a&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;OCaml&amp;#8217;s approach to compilation has a cost, though. Programmers learn to write in a style that pleases the compiler, rather than using more readable or more clearly correct code. To get better performance they may duplicate code, expose type information, manually pack data structures, or avoid the use of higher-order functions, polymorphic types, or functors.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Neil Mitchell makes &lt;a href='http://neilmitchell.blogspot.com/2008/05/haskell-and-performance.html'&gt;similar comments&lt;/a&gt; regarding Haskell.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;If you use GHC, with unboxed operations, written in a low-level style, you can obtain similar performance to C. The Haskell won&amp;#8217;t be as nice as it was before, but will still probably express fewer details than the C code.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;And the Haskell performance wiki page &lt;a href='http://www.haskell.org/haskellwiki/Performance'&gt;concedes&lt;/a&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;The main caveat is that you may have to modify your code significantly in order to improve its performance.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Don Stewart &lt;a href='http://donsbot.wordpress.com/2008/06/04/haskell-as-fast-as-c-working-at-a-high-altitude-for-low-level-performance/'&gt;disagrees&lt;/a&gt;, claiming that it is possible to get &amp;#8220;low level performance&amp;#8221; while working at &amp;#8220;a higher abstraction level.&amp;#8221; However, while I didn&amp;#8217;t understand everything in the article, it seems the program he ends up with is not the most straightforward or succint implementation of the underlying algorithm.&lt;/p&gt;
+
+&lt;p&gt;In addition to optional type declarations, Common Lisp implementations can &lt;a href='http://www.iaeng.org/IJCS/issues_v32/issue_4/IJCS_32_4_19.pdf'&gt;infer&lt;/a&gt; some of the types that are not explicitly specified.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;When not all types are provided by the programmer, modern Lisp compilers try to infer the missing ones from the available information.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;For example, &lt;a href='http://common-lisp.net/project/cmucl/doc/cmu-user/compiler-hint.html#toc154'&gt;here&lt;/a&gt; are the kinds of type inference performed by CMU CL. Go infers types in &lt;a href='http://tour.golang.org/#12'&gt;initialization statements&lt;/a&gt;, and can infer whether an object &lt;a href='http://tour.golang.org/#54'&gt;implements an interface without an explicit declaration saying so&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2 id='sufficiently_smart_compiler'&gt;SUFFICIENTLY SMART COMPILER&lt;/h2&gt;
+
+&lt;p&gt;Following our progression, what if we didn&amp;#8217;t specify types anywhere, and the compiler could still analyze our program, deduce all of the appropriate types, and apply the appropriate performance optimizations? Half jokingly, this is sometimes referred to as the &lt;a href='http://prog21.dadgum.com/40.html'&gt;&amp;#8220;sufficiently smart compiler.&amp;#8221;&lt;/a&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;If you&amp;#8217;re not familiar, here&amp;#8217;s a classic context for using &amp;#8220;sufficiently smart compiler.&amp;#8221; Language X is much slower than C, but that&amp;#8217;s because floating point values are boxed and there&amp;#8217;s a garbage collection system. But&amp;#8230;and here it comes&amp;#8230;given a sufficiently smart compiler those values could be kept in registers and memory allocation patterns could be analyzed and reduced to static allocation. Of course that&amp;#8217;s quite a loaded phrase, right up there with &amp;#8220;left as an exercise for the reader.&amp;#8221;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Perhaps the closest real world approximations to the Sufficiently Smart Compiler are Javascript implementations in major web browsers. Since Javascript has a central role in web application development, improving Javascript performance is a necessity for improving client side web application performance. That is why so much work has gone into improving performance in Javascript engines like Chrome&amp;#8217;s &lt;a href='http://code.google.com/p/v8/'&gt;V8&lt;/a&gt;, Safari&amp;#8217;s &lt;a href='http://trac.webkit.org/wiki/JavaScriptCore'&gt;Nitro&lt;/a&gt;, and Firefox&amp;#8217;s &lt;a href='https://developer.mozilla.org/en-US/docs/SpiderMonkey'&gt;SpiderMonkey&lt;/a&gt;. However, since Javascript has almost no explicit type information, these engines use strategies to infer type information from running programs.&lt;/p&gt;
+
+&lt;p&gt;For example, V8 creates &lt;a href='https://developers.google.com/v8/design#prop_access'&gt;&amp;#8220;hidden classes&amp;#8221;&lt;/a&gt; to replace dynamic lookups of object properties with fixed offset variable lookups. In principle, any property with any value could be added to a Javascript object at any time. In most real world Javascript programs, however, many objects are created with the same set of properties. So when a new object is created or a property is set on an object, V8 will check to see whether a hidden class with the same name and properties already exists. If not, V8 creates a new hidden class with the right set of properties to be reused the next time an object with the same set of properties is needed.&lt;/p&gt;
+
+&lt;p&gt;When I last checked the &lt;a href='http://shootout.alioth.debian.org/u32/which-programming-languages-are-fastest.php'&gt;Benchmark Game speed comparisons&lt;/a&gt;, Javascript V8 was slower than most of the explicitly typed and type inference languages like Haskell and OCaml, but much faster than other languages without explicit types like Python, Ruby and Perl. At the same time V8 code size &lt;a href='http://shootout.alioth.debian.org/u64/which-language-is-best.php?gpp=on&amp;amp;ifc=on&amp;amp;java=on&amp;amp;sbcl=on&amp;amp;ghc=on&amp;amp;csharp=on&amp;amp;racket=on&amp;amp;v8=on&amp;amp;hipe=on&amp;amp;vw=on&amp;amp;php=on&amp;amp;python3=on&amp;amp;lua=on&amp;amp;perl=on&amp;amp;yarv=on&amp;amp;xfullcpu=0&amp;amp;xmem=0&amp;amp;xloc=1&amp;amp;nbody=1&amp;amp;fannkuchredux=1&amp;amp;meteor=1&amp;amp;fasta=1&amp;amp;fastaredux=1&amp;amp;spectralnorm=1&amp;amp;revcomp=1&amp;amp;mandelbrot=1&amp;amp;knucleotide=1&amp;amp;regexdna=1&amp;amp;pidigits=1&amp;amp;chameneosredux=1&amp;amp;threadring=1&amp;amp;binarytreesredux=1&amp;amp;binarytrees=1&amp;amp;calc=chart'&gt;compares favorably&lt;/a&gt; with Python, Ruby and Perl.&lt;/p&gt;
+
+&lt;h2 id='summary'&gt;SUMMARY&lt;/h2&gt;
+
+&lt;p&gt;Providing more information to the compiler makes programs longer, but also gives the compiler more ways to make programs run fast. This tension seems to be behind many of the choices made in programming language design. Using multiple languages, providing optional types, inferring types, and determining types implicitly at runtime are all strategies for addressing this tradeoff.&lt;/p&gt;
+
+&lt;p&gt;I&amp;#8217;m curious to hear if I&amp;#8217;ve missed any major strategies, and I&amp;#8217;m curious to hear about ways to make programs both small and fast having nothing to do with types. For example, how does garbage collection or Lisp style macros address the speed and size tradeoff?&lt;/p&gt;
+
+&lt;p&gt;Let&amp;#8217;s discuss further at &amp;#8230;&lt;/p&gt;</content>
+ </entry>
+ 
+ 
+</feed>

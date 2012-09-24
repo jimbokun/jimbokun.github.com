@@ -1,0 +1,10 @@
+
+http://jimbokun.github.com/archive.html
+http://jimbokun.github.com/atom.xml
+http://jimbokun.github.com/categories.html
+http://jimbokun.github.com/index.html
+http://jimbokun.github.com/pages.html
+http://jimbokun.github.com/sitemap.txt
+http://jimbokun.github.com/tags.html
+
+http://jimbokun.github.com/programming languages/2012/09/23/small-and-fast
