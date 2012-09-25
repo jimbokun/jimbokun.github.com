@@ -197,4 +197,4 @@ Providing more information to the compiler makes programs longer, but also gives
 
 I'm curious to hear if I've missed any major strategies, and I'm curious to hear about ways to make programs both small and fast having nothing to do with types.  For example, how does garbage collection or Lisp style macros address the speed and size tradeoff?
 
-Let's discuss further at ... 
+Let's discuss further at [Hacker News.](http://news.ycombinator.com/item?id=4568023)
