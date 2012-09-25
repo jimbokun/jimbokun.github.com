@@ -6,7 +6,6 @@ category: programming languages
 tags: [programming languages]
 ---
 {% include JB/setup %}
-# SMALL AND FAST
 
 My favorite article comparing programming languages is [The speed, size and dependability of programming languages](http://blog.gmarceau.qc.ca/2009/05/speed-size-and-dependability-of.html) by Guillaume Marceau.  Guillaume plots program size against execution time for programs written in various languages, implementing benchmarks from [The Computer Language Benchmark Game](http://shootout.alioth.debian.org/).  With the X axis program size and the Y axis execution time, the ideal language would have all of its programs plotted in the lower left corner of the chart.  Evidently, his idea was popular enough that now the Benchmarks Game keeps an [up to date version](http://shootout.alioth.debian.org/u64/code-used-time-used-shapes.php) of these charts.
 

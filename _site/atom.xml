@@ -4,7 +4,7 @@
  <title>jimbokun's blog</title>
  <link href="http://jimbokun.github.com/atom.xml" rel="self"/>
  <link href="http://jimbokun.github.com"/>
- <updated>2012-09-24T21:25:48-04:00</updated>
+ <updated>2012-09-24T23:49:15-04:00</updated>
  <id>http://jimbokun.github.com</id>
  <author>
    <name>Jim Rankin</name>
@@ -17,9 +17,7 @@
    <link href="http://jimbokun.github.com/programming languages/2012/09/23/small-and-fast"/>
    <updated>2012-09-23T00:00:00-04:00</updated>
    <id>http://jimbokun.github.com/programming languages/2012/09/23/small-and-fast</id>
-   <content type="html">&lt;h1 id='small_and_fast'&gt;SMALL AND FAST&lt;/h1&gt;
-
-&lt;p&gt;My favorite article comparing programming languages is &lt;a href='http://blog.gmarceau.qc.ca/2009/05/speed-size-and-dependability-of.html'&gt;The speed, size and dependability of programming languages&lt;/a&gt; by Guillaume Marceau. Guillaume plots program size against execution time for programs written in various languages, implementing benchmarks from &lt;a href='http://shootout.alioth.debian.org/'&gt;The Computer Language Benchmark Game&lt;/a&gt;. With the X axis program size and the Y axis execution time, the ideal language would have all of its programs plotted in the lower left corner of the chart. Evidently, his idea was popular enough that now the Benchmarks Game keeps an &lt;a href='http://shootout.alioth.debian.org/u64/code-used-time-used-shapes.php'&gt;up to date version&lt;/a&gt; of these charts.&lt;/p&gt;
+   <content type="html">&lt;p&gt;My favorite article comparing programming languages is &lt;a href='http://blog.gmarceau.qc.ca/2009/05/speed-size-and-dependability-of.html'&gt;The speed, size and dependability of programming languages&lt;/a&gt; by Guillaume Marceau. Guillaume plots program size against execution time for programs written in various languages, implementing benchmarks from &lt;a href='http://shootout.alioth.debian.org/'&gt;The Computer Language Benchmark Game&lt;/a&gt;. With the X axis program size and the Y axis execution time, the ideal language would have all of its programs plotted in the lower left corner of the chart. Evidently, his idea was popular enough that now the Benchmarks Game keeps an &lt;a href='http://shootout.alioth.debian.org/u64/code-used-time-used-shapes.php'&gt;up to date version&lt;/a&gt; of these charts.&lt;/p&gt;
 
 &lt;p&gt;Programming language features besides program size and execution speed might be more important in some contexts, but broadly speaking, much of the history of programming language design is a search for the lower left hand corner of Guillaume&amp;#8217;s chart. Paul Graham argures for a programming language &lt;a href='http://www.paulgraham.com/power.html'&gt;&amp;#8220;succinctness = power.&amp;#8221;&lt;/a&gt; Faster programs are more responsive, answer questions faster, and consume fewer processing resources. Writing short programs is often at odds with writing fast programs, so achieving both simultaneously is a kind of Holy Grail of programming language design.&lt;/p&gt;
 
